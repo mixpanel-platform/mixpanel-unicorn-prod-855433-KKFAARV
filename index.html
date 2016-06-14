@@ -115,9 +115,8 @@
             'properties': {}
           };
             _.each(accums, function(v) {
-              _.each(v.data, function(d) {
-                _.extend(holder.properties, d.properties);
-              });
+                holder.event = v.event;
+                _.extend(holder.properties, v.properties);
             });
           _.each(events, function(v) {
             holder.event = v.name;
