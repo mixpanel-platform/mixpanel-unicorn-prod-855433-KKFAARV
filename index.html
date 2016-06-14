@@ -63,9 +63,8 @@
       $('#run_query').on('click', function(e) {
           $('#run_query').html("Please Wait...").prop("disabled", true);
           events = $('#events').val();
-          if(events && token){
-            runQuery();
-          }
+          runQuery();
+        
       });
       
       $("body").delegate("#resurface_events", "click", function() {
