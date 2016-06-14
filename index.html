@@ -17,7 +17,6 @@
   <div class="mixpanel-platform-section">
       <h1 style="display:none;" class="myDisplay" id="displayName"></h1>
       <div style="display: inline-block;position: relative;padding: 0px 0px 0px 12px;margin: 0px 0px 15px 10px;"><a class="editMPT myDisplay" style="display:none;" id="changeSubmitCred"></a></div>
-      <input style="float: left;" class="myInput credInput" placeholder="Project Name" id="projectName"/>
       <input style="float: left;" class="myInput credInput" placeholder="Token" id="projectToken"/>
       <input style="float: left;" class="myInput credInput" placeholder="API Key" id="projectKey"/>
       <input style="float: left;" class="myInput credInput" placeholder="API Secret" id="projectSecret"/>
@@ -46,7 +45,7 @@
           $("#mp_toolbox").show();
           $(".credInput").hide();
           $(".myDisplay").show();
-          $("#displayName").html("Project Name: " + $('#projectName').val());
+          $("#displayName").html("Project Name: " + $('#projectToken').val());
         });
         $(".myDisplay").click(function() {
           $("#mp_toolbox").show();
