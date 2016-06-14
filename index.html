@@ -10,17 +10,6 @@
     <script src="https://cdn.rawgit.com/mixpanel-platform/mixpanel-unicorn-1-855433-K9huT8m/master/md5.js"></script>
     <script src="https://cdn.rawgit.com/mp-christine/mp-christine/master/platform/assets/json2csv.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.rawgit.com/mixpanel-platform/mixpanel-unicorn-1-855433-K9huT8m/master/styles.css">
-    <style>
-      .new_row {
-        background: url(//cdn.mxpnl.com/cache/db85795727e3c42d2865a215cd85876a/images/reports/funnels3/new_row_spritesheet.png);
-        width: 30px;
-        height: 30px;
-        margin: 15px 0 0 26px;
-        cursor: pointer;
-        position: relative;
-      }
-         
-    </style>
 </head>
 
 <body class="mixpanel-platform-body">
@@ -29,6 +18,7 @@
       <h1 style="display:none;" class="myDisplay" id="displayName"></h1>
       <div style="display: inline-block;position: relative;padding: 0px 0px 0px 12px;margin: 0px 0px 15px 10px;"><a class="editMPT myDisplay" style="display:none;" id="changeSubmitCred"></a></div>
       <input style="float: left;" class="myInput credInput" placeholder="Project Name" id="projectName"/>
+      <input style="float: left;" class="myInput credInput" placeholder="Token" id="projectToken"/>
       <input style="float: left;" class="myInput credInput" placeholder="API Key" id="projectKey"/>
       <input style="float: left;" class="myInput credInput" placeholder="API Secret" id="projectSecret"/>
       <a class="button button_primary credInput" id="submitCred">Set API Credentials</a>
@@ -40,15 +30,12 @@
       <h3>Enter your events here to resurface</h3>
       <div class="mixpanel-platform-section">
           <div style="clear: both;"></div>
-          <div id="add_events">
-            <input  style="float: left;" class="myInput" placeholder="Page Viewed, Button Clicked" id="surveySelect"/>
-            <div class="new_row"  style="float: left;"><div class="grey_vert" style="display: block;"></div></div>
-          </div>
-          
-          <div style="clear: both;"></div>
+          <div id="dateSelect" style="float: left;"></div>
+          <input style="float: left;" class="myInput" placeholder="Page Viewed, Button Clicked" id="events"/>
           <button class="button button_primary" id="run_query">Search Events</button>
+          <div style="clear: both;"></div>
           <br/>
-          <a style="display:none;" class="button button_primary" id="csv_export" href="#">Export to CSV</a>
+          <a style="display:none;" class="button button_primary" id="resurface_events" href="#">Export to CSV</a>
         </div>
     </div>
   
@@ -70,25 +57,30 @@
     <!--Custom Query Scripts Go Here - KEEP IT CLEAN -->
     <script>
       var events;
-      $('#run_query').on('click', function(e, survey) {
+      var token = $('#projectToken').val();
+      var dateSelect  = $('#dateSelect').MPDatepicker();
+
+      $('#run_query').on('click', function(e) {
           $('#run_query').html("Please Wait...").prop("disabled", true);
-          survey_id = $('#surveySelect').val();
-          runQuery();
+          events = $('#events').val();
+          if(events && token){
+            runQuery();
+          }
       });
       
-      $("body").delegate("#csv_export", "click", function() {
+      $("body").delegate("#resurface_events", "click", function() {
           var csv = "data:text/csv;charset=utf-8," + json_to_csv.jsonToCSV(last_response);
           $(this).attr("href", encodeURI(csv)).attr("download",
               "Survey_Export_" + survey_id + "_" + moment().format('MMM-DD-YYYY') + ".csv");
-          $('#csv_export').hide();
+          $('#resurface_events').hide();
       });
       
       var runQuery = function() {
           var queryParams = {
-            from_date: '2016-01-13',
-            to_date: '2016-06-14',
-            token: 'unicorn',
-            events: ["Created Account"],
+            from_date: dateRange.from.toISOString().split('T')[0],
+            to_date: dateRange.to.toISOString().split('T')[0],
+            token: token,
+            events: events.split(","),
           };
           var script = $('#cq_survey').html();
           script = $.trim(script);
@@ -96,7 +88,7 @@
               .done(function(resp) {
                   $('#run_query').html("Search Events").prop("disabled", false);
                   last_response = resp;
-                  $('#csv_export').show();
+                  $('#resurface_events').show();
       
               }).fail(function($xhr) {
                   $('#run_query').html("Search Events").prop("disabled", false);
@@ -151,7 +143,7 @@
       function eventsSelected(){
         var events = [];
         _.each(params.events, function(v) {
-          events.push({event: v});
+          events.push({event: v.trim()});
         });
         return events;
       }
