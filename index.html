@@ -1,15 +1,87 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="https://cdn.mxpnl.com/libs/mixpanel-platform/css/reset.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.mxpnl.com/cache/8ea4a91cd70389613b271278f237f282/bundle/reports.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.mxpnl.com/libs/mixpanel-platform/build/mixpanel-platform.v0.latest.min.css">
     <script src="https://cdn.mxpnl.com/libs/mixpanel-platform/build/mixpanel-platform.v0.latest.min.js"></script>
-  </head>
-  <body class="mixpanel-platform-body">
-    <h1>Hello, World!</h1>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-dateFormat/1.0/jquery.dateFormat.js"></script>
+    <script src="https://cdn.rawgit.com/mixpanel-platform/mixpanel-unicorn-1-855433-K9huT8m/master/md5.js"></script>
+    <script src="json2csv.js" type="text/javascript" charset="utf-8"></script>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+
+<body class="mixpanel-platform-body">
+  <h2>Enter Project Credentials</h2>
+  <div class="mixpanel-platform-section">
+      <h1 style="display:none;" class="myDisplay" id="displayName"></h1>
+      <div style="display: inline-block;position: relative;padding: 0px 0px 0px 12px;margin: 0px 0px 15px 10px;"><a class="editMPT myDisplay" style="display:none;" id="changeSubmitCred"></a></div>
+      <input style="float: left;" class="myInput credInput" placeholder="Project Name" id="projectName"/>
+      <input style="float: left;" class="myInput credInput" placeholder="API Key" id="projectKey"/>
+      <input style="float: left;" class="myInput credInput" placeholder="API Secret" id="projectSecret"/>
+      <a class="button button_primary credInput" id="submitCred">Set API Credentials</a>
+      
+      <div style="clear: both;"></div>
+    </div>
+    <div style="display:none;" id="mp_toolbox" class="mixpanel-platform-section">
+      <h2>Survey Export</h2>
+      <h3>Leave blank to return ALL survey data for the project.</h3>
+      <h3><a href="http://bit.ly/mp_survey_id" target="_blank">Click here for instructions to grab the survey ID</a></h3>
+      <div class="mixpanel-platform-section">
+          <div style="clear: both;"></div>
+          <input style="float: left;" class="myInput" placeholder="Enter Survey ID" id="surveySelect"/>
+          <button class="button button_primary" id="run_query">Run Query</button>
+          <div style="clear: both;"></div>
+          <br/>
+          <a style="display:none;" class="button button_primary" id="csv_export" href="#">Export to CSV</a>
+        </div>
+    </div>
     <script>
-      // Run queries and display results here
+        $("#submitCred").click(function() {
+          MP.api.setCredentials($('#projectKey').val(), $('#projectSecret').val());
+          $("#mp_toolbox").show();
+          $(".credInput").hide();
+          $(".myDisplay").show();
+          $("#displayName").html("Project Name: " + $('#projectName').val());
+        });
+        $(".myDisplay").click(function() {
+          $("#mp_toolbox").show();
+          $(".myDisplay").hide();
+          $(".credInput").show();
+        });
     </script>
-  </body>
+ 
+    <!--Custom Query Scripts Go Here - KEEP IT CLEAN -->
+    <script src="survey_cq.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/cq" id="cq_survey">
+        function main() {
+          return People(
+          ).filter(function(user){
+            var isSurvey = false;
+            var surveyId = params.surveyID;
+            _.each(user.properties.$answers, function(v,k) {
+                if(v.$survey_id == surveyId)
+                  isSurvey = true
+            })
+            return isSurvey
+          }).map(function(user) {
+            var surveyId = params.surveyID;
+            var answers = {};
+            _.each(user.properties.$answers, function(v,k) {
+                if(v.$survey_id == surveyId){
+                  answers["Collection ID"] = v.$collection_id;
+                  answers["Question ID - " + v.$question_id] = v.$value;
+                }
+            })
+            return {
+              "distinct_id": user.distinct_id,
+              "Email": user.properties.$email,
+              "City": user.properties.$city,
+              "Survey": answers
+              }
+          });
+        }
+    </script>
+</body>
 </html>
