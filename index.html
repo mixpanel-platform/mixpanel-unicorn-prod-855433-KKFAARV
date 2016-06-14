@@ -108,8 +108,9 @@
                   for: v.event,
                   text: v.event
               }).html(v.event);
+              eventsTableOptions[input] = {Event: label};
             });
-            eventsTableOptions[input] = {Event: label};
+            console.log(eventsTableOptions)
             eventChart.MPTable('setData', resp[0]);
             $('#eventSelect').show();
 
