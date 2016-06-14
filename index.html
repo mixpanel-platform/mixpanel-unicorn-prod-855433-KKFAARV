@@ -27,11 +27,10 @@
     <div style="display:none;" id="mp_toolbox" class="mixpanel-platform-section">
       <h2>Resurface Events</h2>
       <h3>Enter your events here to resurface</h3>
-      <h3><a href="http://bit.ly/mp_survey_id" target="_blank">Click here for instructions to grab the survey ID</a></h3>
       <div class="mixpanel-platform-section">
           <div style="clear: both;"></div>
           <input style="float: left;" class="myInput" placeholder="Enter Survey ID" id="surveySelect"/>
-          <button class="button button_primary" id="run_query">Run Query</button>
+          <button class="button button_primary" id="run_query">Resurface Events</button>
           <div style="clear: both;"></div>
           <br/>
           <a style="display:none;" class="button button_primary" id="csv_export" href="#">Export to CSV</a>
@@ -53,7 +52,50 @@
     </script>
  
     <!--Custom Query Scripts Go Here - KEEP IT CLEAN -->
-    <script src="survey_cq.js" type="text/javascript" charset="utf-8"></script>
+    <script>
+    var events;
+
+    $('#run_query').on('click', function(e, survey) {
+        $('#run_query').html("Please Wait...").prop("disabled", true);
+        survey_id = $('#surveySelect').val();
+        runQuery();
+    });
+    
+    $("body").delegate("#csv_export", "click", function() {
+        var csv = "data:text/csv;charset=utf-8," + json_to_csv.jsonToCSV(last_response);
+        $(this).attr("href", encodeURI(csv)).attr("download",
+            "Survey_Export_" + survey_id + "_" + moment().format('MMM-DD-YYYY') + ".csv");
+        $('#csv_export').hide();
+    });
+    
+    var runQuery = function() {
+        var queryParams = {
+          from_date: '2016-01-13',
+          to_date: '2016-06-14',
+          token: 'unicorn',
+          events: ["Created Account"],
+        };
+        var script = $('#cq_survey').html();
+        script = $.trim(script);
+        MP.api.custom_query(script, queryParams)
+            .done(function(resp) {
+                $('#run_query').html("Run Query").prop("disabled", false);
+                last_response = resp;
+                $('#csv_export').show();
+    
+            }).fail(function($xhr) {
+                $('#run_query').html("Run Query").prop("disabled", false);
+                // Somehow the request is not parsed into JSON event with application/json header
+                var error = $xhr.request.responseText;
+                var error_text = "Requst failed";
+                try {
+                    error_text = JSON.parse(error).error;
+                } catch (err) {
+                    error_text = $xhr.request.responseText;
+                }
+            });
+    }
+    </script>
     <script type="text/cq" id="cq_survey">
     function main() {
       return Events({
