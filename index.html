@@ -87,12 +87,17 @@
         .done(function(resp) {
             $('#run_query').html("Search Events").prop("disabled", false);
             last_response = resp;
-            _.each(resp, function(e) {
+            _.each(resp, function(v,k) {
               $('<input>').attr({
                   type: 'checkbox',
-                  id: 'event',
-                  name: e.event,
-                  value: e
+                  id: v.event,
+                  name: 'event',
+                  value: k
+              }).appendTo('#eventSelect');
+            });
+            $('<label>').attr({
+                  for: v.event,
+                  text: v.event
               }).appendTo('#eventSelect');
             });
             $('#eventSelect').show();
