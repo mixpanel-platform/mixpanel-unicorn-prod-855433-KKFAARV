@@ -74,32 +74,33 @@
           $('#resurface_events').hide();
       });
       
-      var runQuery = function() {
-          var queryParams = {
-            from_date: dateRange.from.toISOString().split('T')[0],
-            to_date: dateRange.to.toISOString().split('T')[0],
-            token: token,
-            events: events.split(","),
-          };
-          var script = $('#cq_survey').html();
-          script = $.trim(script);
-          MP.api.custom_query(script, queryParams)
-              .done(function(resp) {
-                  $('#run_query').html("Search Events").prop("disabled", false);
-                  last_response = resp;
-                  $('#resurface_events').show();
-      
-              }).fail(function($xhr) {
-                  $('#run_query').html("Search Events").prop("disabled", false);
-                  // Somehow the request is not parsed into JSON event with application/json header
-                  var error = $xhr.request.responseText;
-                  var error_text = "Requst failed";
-                  try {
-                      error_text = JSON.parse(error).error;
-                  } catch (err) {
-                      error_text = $xhr.request.responseText;
-                  }
-              });
+    var runQuery = function() {
+      dateRange = dateSelect.MPDatepicker('value');
+      var queryParams = {
+        from_date: dateRange.from.toISOString().split('T')[0],
+        to_date: dateRange.to.toISOString().split('T')[0],
+        token: token,
+        events: events.split(","),
+      };
+      var script = $('#cq_survey').html();
+      script = $.trim(script);
+      MP.api.custom_query(script, queryParams)
+        .done(function(resp) {
+            $('#run_query').html("Search Events").prop("disabled", false);
+            last_response = resp;
+            $('#resurface_events').show();
+
+        }).fail(function($xhr) {
+            $('#run_query').html("Search Events").prop("disabled", false);
+            // Somehow the request is not parsed into JSON event with application/json header
+            var error = $xhr.request.responseText;
+            var error_text = "Requst failed";
+            try {
+                error_text = JSON.parse(error).error;
+            } catch (err) {
+                error_text = $xhr.request.responseText;
+            }
+        });
       }
     </script>
     <script type="text/cq" id="cq_survey">
