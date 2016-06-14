@@ -97,7 +97,7 @@
             $('<label>').attr({
                   for: v.event,
                   text: v.event
-              }).appendTo('#eventSelect');
+              }).html(v.event).appendTo('#eventSelect');
             });
             $('#eventSelect').show();
 
