@@ -128,15 +128,13 @@
           });
           return holder;
         }).map(function(event) {
-          var resurface = {
-            properties: {
+          var properties = {
                 'token': params.token,
                 'time': _.now(),
                 'ip': '0'
-              }
-          };
-          _.extend(resurface, event.value);
-          return resurface;
+              };
+          _.extend(event.value.properties, properties);
+          return event.value;
         });
       }
       function eventsSelected(){
