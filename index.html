@@ -30,12 +30,13 @@
       <div class="mixpanel-platform-section">
           <div style="clear: both;"></div>
           <input style="float: left;" class="myInput" placeholder="Enter Survey ID" id="surveySelect"/>
-          <button class="button button_primary" id="run_query">Resurface Events</button>
+          <button class="button button_primary" id="run_query">Search Events</button>
           <div style="clear: both;"></div>
           <br/>
           <a style="display:none;" class="button button_primary" id="csv_export" href="#">Export to CSV</a>
         </div>
     </div>
+  
     <script>
         $("#submitCred").click(function() {
           MP.api.setCredentials($('#projectKey').val(), $('#projectSecret').val());
@@ -53,93 +54,92 @@
  
     <!--Custom Query Scripts Go Here - KEEP IT CLEAN -->
     <script>
-    var events;
-
-    $('#run_query').on('click', function(e, survey) {
-        $('#run_query').html("Please Wait...").prop("disabled", true);
-        survey_id = $('#surveySelect').val();
-        runQuery();
-    });
-    
-    $("body").delegate("#csv_export", "click", function() {
-        var csv = "data:text/csv;charset=utf-8," + json_to_csv.jsonToCSV(last_response);
-        $(this).attr("href", encodeURI(csv)).attr("download",
-            "Survey_Export_" + survey_id + "_" + moment().format('MMM-DD-YYYY') + ".csv");
-        $('#csv_export').hide();
-    });
-    
-    var runQuery = function() {
-        var queryParams = {
-          from_date: '2016-01-13',
-          to_date: '2016-06-14',
-          token: 'unicorn',
-          events: ["Created Account"],
-        };
-        var script = $('#cq_survey').html();
-        script = $.trim(script);
-        MP.api.custom_query(script, queryParams)
-            .done(function(resp) {
-                $('#run_query').html("Run Query").prop("disabled", false);
-                last_response = resp;
-                $('#csv_export').show();
-    
-            }).fail(function($xhr) {
-                $('#run_query').html("Run Query").prop("disabled", false);
-                // Somehow the request is not parsed into JSON event with application/json header
-                var error = $xhr.request.responseText;
-                var error_text = "Requst failed";
-                try {
-                    error_text = JSON.parse(error).error;
-                } catch (err) {
-                    error_text = $xhr.request.responseText;
-                }
-            });
-    }
+      var events;
+      $('#run_query').on('click', function(e, survey) {
+          $('#run_query').html("Please Wait...").prop("disabled", true);
+          survey_id = $('#surveySelect').val();
+          runQuery();
+      });
+      
+      $("body").delegate("#csv_export", "click", function() {
+          var csv = "data:text/csv;charset=utf-8," + json_to_csv.jsonToCSV(last_response);
+          $(this).attr("href", encodeURI(csv)).attr("download",
+              "Survey_Export_" + survey_id + "_" + moment().format('MMM-DD-YYYY') + ".csv");
+          $('#csv_export').hide();
+      });
+      
+      var runQuery = function() {
+          var queryParams = {
+            from_date: '2016-01-13',
+            to_date: '2016-06-14',
+            token: 'unicorn',
+            events: ["Created Account"],
+          };
+          var script = $('#cq_survey').html();
+          script = $.trim(script);
+          MP.api.custom_query(script, queryParams)
+              .done(function(resp) {
+                  $('#run_query').html("Search Events").prop("disabled", false);
+                  last_response = resp;
+                  $('#csv_export').show();
+      
+              }).fail(function($xhr) {
+                  $('#run_query').html("Search Events").prop("disabled", false);
+                  // Somehow the request is not parsed into JSON event with application/json header
+                  var error = $xhr.request.responseText;
+                  var error_text = "Requst failed";
+                  try {
+                      error_text = JSON.parse(error).error;
+                  } catch (err) {
+                      error_text = $xhr.request.responseText;
+                  }
+              });
+      }
     </script>
     <script type="text/cq" id="cq_survey">
-    function main() {
-      return Events({
-        from_date: params.from_date,
-        to_date:  params.to_date,
-        event_selectors: eventsSelected()
-      })
-      .groupBy(["name"], function(accums, events) {
-        var holder = {
-          'properties': {}
-        };
-          _.each(accums, function(v) {
-            _.each(v.data, function(d) {
-              _.extend(holder.properties, d.properties);
+      function main() {
+        return Events({
+          from_date: params.from_date,
+          to_date:  params.to_date,
+          event_selectors: eventsSelected()
+        })
+        .groupBy(["name"], function(accums, events) {
+          var holder = {
+            'properties': {}
+          };
+            _.each(accums, function(v) {
+              _.each(v.data, function(d) {
+                _.extend(holder.properties, d.properties);
+              });
+            });
+          _.each(events, function(v) {
+            holder.event = v.name;
+            _.each(v.properties, function(value, key) {
+              var prop = {};
+              prop[key] = "import";
+              _.extend(holder.properties, prop);
             });
           });
-        _.each(events, function(v) {
-          holder.event = v.name;
-          _.each(v.properties, function(value, key) {
-            var prop = {};
-            prop[key] = "import";
-            _.extend(holder.properties, prop);
-          });
+          return holder;
+        }).map(function(event) {
+          var resurface = {
+            properties: {
+                'token': params.token,
+                'time': _.now(),
+                'ip': '0'
+              }
+          };
+          _.extend(resurface, event.value);
+          return resurface;
         });
-        return holder;
-      }).map(function(event) {
-        var resurface = {
-          properties: {
-              'token': params.token,
-              'time': _.now(),
-              'ip': '0'
-            }
-        };
-        _.extend(resurface, event.value);
-        return resurface;
-      });
-    }
-    function eventsSelected(){
-      var events = [];
-      _.each(params.events, function(v) {
-        events.push({event: v});
-      });
-      return events;
-    }
+      }
+      function eventsSelected(){
+        var events = [];
+        _.each(params.events, function(v) {
+          events.push({event: v});
+        });
+        return events;
+      }
     </script>
 </body>
 </html>
