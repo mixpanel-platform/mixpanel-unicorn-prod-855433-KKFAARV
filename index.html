@@ -25,8 +25,8 @@
       <div style="clear: both;"></div>
     </div>
     <div style="display:none;" id="mp_toolbox" class="mixpanel-platform-section">
-      <h2>Survey Export</h2>
-      <h3>Leave blank to return ALL survey data for the project.</h3>
+      <h2>Resurface Events</h2>
+      <h3>Enter your events here to resurface</h3>
       <h3><a href="http://bit.ly/mp_survey_id" target="_blank">Click here for instructions to grab the survey ID</a></h3>
       <div class="mixpanel-platform-section">
           <div style="clear: both;"></div>
@@ -55,33 +55,49 @@
     <!--Custom Query Scripts Go Here - KEEP IT CLEAN -->
     <script src="survey_cq.js" type="text/javascript" charset="utf-8"></script>
     <script type="text/cq" id="cq_survey">
-        function main() {
-          return People(
-          ).filter(function(user){
-            var isSurvey = false;
-            var surveyId = params.surveyID;
-            _.each(user.properties.$answers, function(v,k) {
-                if(v.$survey_id == surveyId)
-                  isSurvey = true
-            })
-            return isSurvey
-          }).map(function(user) {
-            var surveyId = params.surveyID;
-            var answers = {};
-            _.each(user.properties.$answers, function(v,k) {
-                if(v.$survey_id == surveyId){
-                  answers["Collection ID"] = v.$collection_id;
-                  answers["Question ID - " + v.$question_id] = v.$value;
-                }
-            })
-            return {
-              "distinct_id": user.distinct_id,
-              "Email": user.properties.$email,
-              "City": user.properties.$city,
-              "Survey": answers
-              }
+    function main() {
+      return Events({
+        from_date: params.from_date,
+        to_date:  params.to_date,
+        event_selectors: eventsSelected()
+      })
+      .groupBy(["name"], function(accums, events) {
+        var holder = {
+          'properties': {}
+        };
+          _.each(accums, function(v) {
+            _.each(v.data, function(d) {
+              _.extend(holder.properties, d.properties);
+            });
           });
-        }
+        _.each(events, function(v) {
+          holder.event = v.name;
+          _.each(v.properties, function(value, key) {
+            var prop = {};
+            prop[key] = "import";
+            _.extend(holder.properties, prop);
+          });
+        });
+        return holder;
+      }).map(function(event) {
+        var resurface = {
+          properties: {
+              'token': params.token,
+              'time': _.now(),
+              'ip': '0'
+            }
+        };
+        _.extend(resurface, event.value);
+        return resurface;
+      });
+    }
+    function eventsSelected(){
+      var events = [];
+      _.each(params.events, function(v) {
+        events.push({event: v});
+      });
+      return events;
+    }
     </script>
 </body>
 </html>
