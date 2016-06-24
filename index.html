@@ -90,7 +90,7 @@
                   class: 'resurfaceEvents',
                   id: v.event,
                   name: 'event',
-                  value: v
+                  value: window.btoa(v);
               }).appendTo('#eventSelect');
             $('<label>').attr({
                   for: v.event,
