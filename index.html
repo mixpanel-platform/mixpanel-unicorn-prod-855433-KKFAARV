@@ -28,13 +28,13 @@
           <div style="clear: both;"></div>
           <br/>
         <div style="clear: both;"></div>
-        <div class="mixpanel-platform-section">
+        <div id="resurface" class="mixpanel-platform-section">
           <div id="eventSelect" style="float: left;width:45%">
             <button class="button button_primary" id="resurface_events">Resurface Events</button>
             <br/>
           </div>
           <div id="eventImported" style="float: left;width:45%">
-            <button class="button button_primary" id="resurface_events">Resurface Events</button>
+            <h2>Resurfaced Events</h2>
             <br/>
           </div>
           <div style="clear: both;"></div>
@@ -61,6 +61,7 @@
     <script>
       var events;
       var allEvents = {};
+      var allEventsCount = 0;
       var token = $('#projectToken').val();
       var projectKey = $('#projectKey').val();
       var dateSelect  = $('#dateSelect').MPDatepicker();
@@ -95,20 +96,23 @@
               if(!allEvents[v.event]){
                 $('<input>').attr({
                 type: 'checkbox',
-                class: 'resurfaceEvents',
-                id: v.event,
+                class: 'resurfaceEvents ' + allEventsCount,
+                id: allEventsCount,
                 name: 'event',
+                event: v.event,
                 value: window.btoa(JSON.stringify(v))
                   }).appendTo('#eventSelect');
                 $('<label>').attr({
                   for: v.event,
-                  text: v.event
+                  text: v.event,
+                  class: allEventsCount
                 }).html(v.event).appendTo('#eventSelect');
                 $('<br>').appendTo('#eventSelect'); 
               }
+              allEventsCount++;
               allEvents[v.event] = true;
             });
-            $('#eventSelect').show();
+            $('#resurface').show();
 
         }).fail(function($xhr) {
             $('#run_query').html("Search Events").prop("disabled", false);
@@ -127,8 +131,11 @@
         _.each(events, function(v) {
           $.post( "https://api.mixpanel.com/import/?verbose=1&api_key=" + projectKey, { data: v.value })
           .done(function(data) {
-            $('#'+v).prop( "checked", false )
-            .prop( "disabled", true );
+            $('#'+v.id).prop( "checked", false );
+            $('.'+v.id).remove();
+            $('<h3>').attr({
+                  text: v.event,
+                }).html(v.event).appendTo('#resurface_events');
           })
           .fail(function(data) {
           });
