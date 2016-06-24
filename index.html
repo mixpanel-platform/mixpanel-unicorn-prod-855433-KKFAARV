@@ -133,7 +133,7 @@
           .done(function(data) {
             $('#'+v.id).prop( "checked", false );
             $('.'+v.id).remove();
-            $('<h3>').text(v.event).appendTo('#eventImported');
+            $('<h3>').text(v.id).appendTo('#eventImported');
           })
           .fail(function(data) {
           });
