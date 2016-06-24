@@ -28,7 +28,12 @@
           <button class="button button_primary" id="run_query">Search Events</button>
           <div style="clear: both;"></div>
           <br/>
-          <div id="eventSelect" style="display:none;" class="mixpanel-platform-section">
+          <div id="eventSelect" style="display:none;width:50%" class="mixpanel-platform-section">
+            <button class="button button_primary" id="resurface_events">Resurface Events</button>
+            <div style="clear: both;"></div>
+            <br/>
+          </div>
+          <div id="eventImported" style="width:50%" class="mixpanel-platform-section">
             <button class="button button_primary" id="resurface_events">Resurface Events</button>
             <div style="clear: both;"></div>
             <br/>
@@ -112,7 +117,7 @@
             try {
                 error_text = JSON.parse(error).error;
             } catch (err) {
-                error_text = $xhr.request.responseText;
+                error_text = err;
             }
         });
       }
@@ -121,10 +126,10 @@
         _.each(events, function(v) {
           $.post( "https://api.mixpanel.com/import/?verbose=1&api_key=" + projectKey, { data: v.value })
           .done(function(data) {
-            console.log(data);
+            $('#'+v).prop( "checked", false )
+            .prop( "disabled", true );
           })
           .fail(function(data) {
-            console.log(data);
           });
         });
       }
