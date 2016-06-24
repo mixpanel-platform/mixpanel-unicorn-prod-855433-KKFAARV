@@ -116,7 +116,7 @@
       
       function resurface(events){
         _.each(events, function(v) {
-          $.post( "http://api.mixpanel.com/import/?verbose=1&api_key=" + projectKey, { data: v.value })
+          $.post( "https://api.mixpanel.com/import/?verbose=1&api_key=" + projectKey, { data: v.value })
           .done(function(data) {
             console.log(data);
           })
