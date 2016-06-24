@@ -5,9 +5,6 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.mxpnl.com/libs/mixpanel-platform/css/reset.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.mxpnl.com/libs/mixpanel-platform/build/mixpanel-platform.v0.latest.min.css">
     <script src="https://cdn.mxpnl.com/libs/mixpanel-platform/build/mixpanel-platform.v0.latest.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-dateFormat/1.0/jquery.dateFormat.js"></script>
-    <script src="https://cdn.rawgit.com/mixpanel-platform/mixpanel-unicorn-1-855433-K9huT8m/master/md5.js"></script>
-    <script src="https://cdn.rawgit.com/mp-christine/mp-christine/master/platform/assets/json2csv.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.rawgit.com/mixpanel-platform/mixpanel-unicorn-1-855433-K9huT8m/master/styles.css">
 </head>
 
@@ -16,9 +13,8 @@
   <div class="mixpanel-platform-section">
       <h1 style="display:none;" class="myDisplay" id="displayName"></h1>
       <div style="display: inline-block;position: relative;padding: 0px 0px 0px 12px;margin: 0px 0px 15px 10px;"><a class="editMPT myDisplay" style="display:none;" id="changeSubmitCred"></a></div>
-      <input style="float: left;" class="myInput credInput" placeholder="Token" id="projectToken"/>
-      <input style="float: left;" class="myInput credInput" placeholder="API Key" id="projectKey"/>
-      <input style="float: left;" class="myInput credInput" placeholder="API Secret" id="projectSecret"/>
+      <input style="float: left;" class="myInput credInput" value="unicorn" placeholder="Token" id="projectToken"/>
+      <input style="float: left;" class="myInput credInput" value="unicorn" placeholder="API Key" id="projectKey"/>
       <a class="button button_primary credInput" id="submitCred">Set API Credentials</a>
       
       <div style="clear: both;"></div>
@@ -59,6 +55,7 @@
     <script>
       var events;
       var token = $('#projectToken').val();
+      var projectKey = $('#projectKey').val();
       var dateSelect  = $('#dateSelect').MPDatepicker();
 
       $('#run_query').on('click', function(e) {
@@ -69,10 +66,8 @@
       });
       
       $("body").delegate("#resurface_events", "click", function() {
-          var csv = "data:text/csv;charset=utf-8," + json_to_csv.jsonToCSV(last_response);
-          $(this).attr("href", encodeURI(csv)).attr("download",
-              "Survey_Export_" + survey_id + "_" + moment().format('MMM-DD-YYYY') + ".csv");
-          $('#resurface_events').hide();
+        var eventsSelected = $( ".resurfaceEvents:checked" ).val();
+        console.log(eventsSelected);
       });
       
     var runQuery = function() {
@@ -91,6 +86,7 @@
             _.each(resp, function(v,k) {
               $('<input>').attr({
                   type: 'checkbox',
+                  class: 'resurfaceEvents',
                   id: v.event,
                   name: 'event',
                   value: k
@@ -113,6 +109,17 @@
             } catch (err) {
                 error_text = $xhr.request.responseText;
             }
+        });
+      }
+      
+      function resurface(){
+        var encodedData = window.btoa("Hello, world");
+        $.post( "http://api.mixpanel.com/import/?verbose=1&api_key=" + projectKey, 
+          { data: "test"
+            
+          })
+        .done(function( data ) {
+          alert( "Data Loaded: " + data );
         });
       }
     </script>
