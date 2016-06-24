@@ -87,7 +87,7 @@
             $('#run_query').html("Search Events").prop("disabled", false);
             last_response = resp;
             _.each(resp, function(v) {
-              if(!allEvents){
+              if(!allEvents[v.event]){
                 $('<input>').attr({
                 type: 'checkbox',
                 class: 'resurfaceEvents',
