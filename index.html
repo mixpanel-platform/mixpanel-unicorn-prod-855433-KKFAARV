@@ -54,7 +54,8 @@
  
     <!--Custom Query Scripts Go Here - KEEP IT CLEAN -->
     <script>
-      var events = {};
+      var events;
+      var allEvents = {};
       var token = $('#projectToken').val();
       var projectKey = $('#projectKey').val();
       var dateSelect  = $('#dateSelect').MPDatepicker();
@@ -86,7 +87,7 @@
             $('#run_query').html("Search Events").prop("disabled", false);
             last_response = resp;
             _.each(resp, function(v) {
-              if(!events){
+              if(!allEvents){
                 $('<input>').attr({
                 type: 'checkbox',
                 class: 'resurfaceEvents',
@@ -100,7 +101,7 @@
                 }).html(v.event).appendTo('#eventSelect');
                 $('<br>').appendTo('#eventSelect'); 
               }
-              events[v.event] = true;
+              allEvents[v.event] = true;
             });
             $('#eventSelect').show();
 
