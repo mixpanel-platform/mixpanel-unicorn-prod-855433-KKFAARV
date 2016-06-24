@@ -69,6 +69,7 @@
       $("body").delegate("#resurface_events", "click", function() {
         var eventsSelected = $( ".resurfaceEvents:checked" );
         console.log(eventsSelected);
+        resurface(eventsSelected);
       });
       
     var runQuery = function() {
@@ -84,7 +85,7 @@
         .done(function(resp) {
             $('#run_query').html("Search Events").prop("disabled", false);
             last_response = resp;
-            _.each(resp, function(v,k) {
+            _.each(resp, function(v) {
               $('<input>').attr({
                   type: 'checkbox',
                   class: 'resurfaceEvents',
@@ -114,13 +115,14 @@
       }
       
       function resurface(){
-        var encodedData = window.btoa("Hello, world");
-        $.post( "http://api.mixpanel.com/import/?verbose=1&api_key=" + projectKey, 
-          { data: "test"
-            
+        _.each(resp, function(v) {
+          $.post( "http://api.mixpanel.com/import/?verbose=1&api_key=" + projectKey, { data: v.value })
+          .done(function(data) {
+            console.log(data);
           })
-        .done(function( data ) {
-          alert( "Data Loaded: " + data );
+          .fail(function(data) {
+            console.log(data);
+          });
         });
       }
     </script>
