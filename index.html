@@ -131,10 +131,23 @@
       }
     </script>
     <script type="text/cq" id="cq_survey">
+      var default_props = ["$city", "$region", "mp_country_code", "$brand", "$bluetooth_version", "$device", "$os", "$app_release", "$app_version", "$carrier", "$lib_version", "$wifi", "$screen_width", "$screen_height", "$model", "$os_version", "$manufacturer", "$screen_dpi", "$has_telephone", "has_nfc", "$bluetooth_enabled", "$browser", "$initial_referrer", "$initial_referring_domain", "$referrer", "$referring_domain", "$browser_version", "mp_keyword", "$search_engine", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "$radio", "mp_device_model", "$google_play_services", "mp_lib", "campaign_id", "message_id", "message_subtype", "message_type", "$answer_count", "survey_id", "collection_id", "$survey_shown", "$watch_model", "$ios_ifa", "$current_url", "$duration", "$from_binding", "$experiments", "$import", "distinct_id", "time", "$has_nfc"];
+
+      var default_events = ['$campaign_delivery', '$campaign_marked_spam', '$campaign_bounced', '$campaign_open', '$experiment_started', '$show_survey'];
+      
+      params = {
+          from_date: '2016-05-13',
+          to_date: '2016-06-14',
+          token: 'unicorn'
+      };
       function main() {
         return Events({
           from_date: params.from_date,
           to_date:  params.to_date,
+          event_selectors: eventsSelected()
+        })
+        .filter(function(event) {
+          return _.indexOf(default_events, event.name) == -1;
         })
         .groupBy(["name"], function(accums, events) {
           var holder = {
@@ -159,6 +172,7 @@
                 'time': _.now(),
                 'ip': '0'
               };
+          event.value.properties = _.omit(event.value.properties, default_props);
           _.extend(event.value.properties, properties);
           return event.value;
         });
