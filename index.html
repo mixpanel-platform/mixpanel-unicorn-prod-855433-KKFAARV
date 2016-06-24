@@ -80,7 +80,7 @@
       };
       var script = $('#cq_survey').html();
       script = $.trim(script);
-      MP.api.custom_query(script, queryParams)
+      MP.api.jql(script, queryParams)
         .done(function(resp) {
             $('#run_query').html("Search Events").prop("disabled", false);
             last_response = resp;
