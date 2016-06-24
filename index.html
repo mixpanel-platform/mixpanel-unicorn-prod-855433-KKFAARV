@@ -54,7 +54,7 @@
  
     <!--Custom Query Scripts Go Here - KEEP IT CLEAN -->
     <script>
-      var events;
+      var events = {};
       var token = $('#projectToken').val();
       var projectKey = $('#projectKey').val();
       var dateSelect  = $('#dateSelect').MPDatepicker();
@@ -86,18 +86,21 @@
             $('#run_query').html("Search Events").prop("disabled", false);
             last_response = resp;
             _.each(resp, function(v) {
-              $('<input>').attr({
-                  type: 'checkbox',
-                  class: 'resurfaceEvents',
-                  id: v.event,
-                  name: 'event',
-                  value: window.btoa(JSON.stringify(v))
-              }).appendTo('#eventSelect');
-            $('<label>').attr({
+              if(!events){
+                $('<input>').attr({
+                type: 'checkbox',
+                class: 'resurfaceEvents',
+                id: v.event,
+                name: 'event',
+                value: window.btoa(JSON.stringify(v))
+                  }).appendTo('#eventSelect');
+                $('<label>').attr({
                   for: v.event,
                   text: v.event
-              }).html(v.event).appendTo('#eventSelect');
-            $('<br>').appendTo('#eventSelect');
+                }).html(v.event).appendTo('#eventSelect');
+                $('<br>').appendTo('#eventSelect'); 
+              }
+              events[v.event] = true;
             });
             $('#eventSelect').show();
 
