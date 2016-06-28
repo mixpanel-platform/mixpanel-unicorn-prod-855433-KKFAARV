@@ -62,8 +62,8 @@
       var events;
       var allEvents = {};
       var allEventsCount = 0;
-      var token = $('#projectToken').val();
-      var projectKey = $('#projectKey').val();
+      var token;
+      var projectKey;
       var dateSelect  = $('#dateSelect').MPDatepicker();
 
       $('#run_query').on('click', function(e) {
@@ -80,6 +80,8 @@
       });
       
     var runQuery = function() {
+      token = $('#projectToken').val();
+      projectKey = $('#projectKey').val();
       dateRange = dateSelect.MPDatepicker('value');
       var queryParams = {
         from_date: dateRange.from.toISOString().split('T')[0],
