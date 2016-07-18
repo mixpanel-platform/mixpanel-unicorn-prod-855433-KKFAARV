@@ -5,7 +5,7 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.mxpnl.com/libs/mixpanel-platform/css/reset.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.mxpnl.com/libs/mixpanel-platform/build/mixpanel-platform.v0.latest.min.css">
     <script src="https://cdn.mxpnl.com/libs/mixpanel-platform/build/mixpanel-platform.v0.latest.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.rawgit.com/mixpanel-platform/mixpanel-unicorn-1-855433-K9huT8m/master/styles.css">
+    <link rel="stylesheet" type="text/css" href="/styles.css">
 </head>
 
 <body class="mixpanel-platform-body">
@@ -15,9 +15,9 @@
       <div style="display: inline-block;position: relative;padding: 0px 0px 0px 12px;margin: 0px 0px 15px 10px;"><a class="editMPT myDisplay" style="display:none;" id="changeSubmitCred"></a></div>
       <input style="float: left;" class="myInput credInput" placeholder="Token" id="projectToken"/>
       <input style="float: left;" class="myInput credInput" placeholder="API Key" id="projectKey"/>
-      <input style="float: left;" class="myInput credInput" placeholder="API Key" id="projectSecret"/>
+      <input style="float: left;" class="myInput credInput" placeholder="API Secret" id="projectSecret"/>
       <a class="button button_primary credInput" id="submitCred">Set API Credentials</a>
-      
+
       <div style="clear: both;"></div>
     </div>
     <div style="display:none;" id="mp_toolbox" class="mixpanel-platform-section">
@@ -41,7 +41,7 @@
           </div>
       </div>
     </div>
-  
+
     <script>
         $("#submitCred").click(function() {
           MP.api.setCredentials($('#projectKey').val(), $('#projectSecret').val());
@@ -56,7 +56,7 @@
           $(".credInput").show();
         });
     </script>
- 
+
     <!--Custom Query Scripts Go Here - KEEP IT CLEAN -->
     <script>
       var events;
@@ -70,15 +70,14 @@
           $('#run_query').html("Please Wait...").prop("disabled", true);
           events = $('#events').val();
           runQuery();
-        
+
       });
-      
+
       $("body").delegate("#resurface_events", "click", function() {
         var eventsSelected = $( ".resurfaceEvents:checked" );
-        console.log(eventsSelected);
         resurface(eventsSelected);
       });
-      
+
     var runQuery = function() {
       token = $('#projectToken').val();
       projectKey = $('#projectKey').val();
@@ -108,7 +107,7 @@
                   text: v.event,
                   class: allEventsCount
                 }).html(v.event).appendTo('#eventSelect');
-                $('<br>').appendTo('#eventSelect'); 
+                $('<br>').appendTo('#eventSelect');
               }
               allEventsCount++;
               allEvents[v.event] = true;
@@ -127,7 +126,7 @@
             }
         });
       }
-      
+
       function resurface(events){
         _.each(events, function(v) {
           $.post( "https://api.mixpanel.com/import/?verbose=1&api_key=" + projectKey, { data: v.value })
@@ -145,7 +144,7 @@
       var default_props = ["$city", "$region", "mp_country_code", "$brand", "$bluetooth_version", "$device", "$os", "$app_release", "$app_version", "$carrier", "$lib_version", "$wifi", "$screen_width", "$screen_height", "$model", "$os_version", "$manufacturer", "$screen_dpi", "$has_telephone", "has_nfc", "$bluetooth_enabled", "$browser", "$initial_referrer", "$initial_referring_domain", "$referrer", "$referring_domain", "$browser_version", "mp_keyword", "$search_engine", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "$radio", "mp_device_model", "$google_play_services", "mp_lib", "campaign_id", "message_id", "message_subtype", "message_type", "$answer_count", "survey_id", "collection_id", "$survey_shown", "$watch_model", "$ios_ifa", "$current_url", "$duration", "$from_binding", "$experiments", "$import", "distinct_id", "time", "$has_nfc"];
 
       var default_events = ['$campaign_delivery', '$campaign_marked_spam', '$campaign_bounced', '$campaign_open', '$experiment_started', '$show_survey'];
-      
+
       params = {
           from_date: '2016-05-13',
           to_date: '2016-06-14',
